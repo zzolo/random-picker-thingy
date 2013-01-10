@@ -21,6 +21,15 @@
 
   <div id="random-picker-container-thingy"></div>
 
+  <script type="text/template" id="template-loading">
+    <div class="loading">Loading data...</div>
+  </script>
+
+  <script type="text/template" id="template-square">
+    <div class="choice-square" data-choice="<%= member %>" style="width: <%= width %>px; height: <%= height %>px; background-color: <%= color %>;">
+    </div>
+  </script>
+
   <script src="js/libs/jquery-1.8.3.min.js"></script>
   <script src="js/libs/underscore-1.4.3.min.js"></script>
   <script src="js/app.js"></script>
