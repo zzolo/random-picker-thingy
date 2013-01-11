@@ -6,6 +6,13 @@
   var dataURL = 'https://api.scraperwiki.com/api/1.0/datastore/sqlite?format=jsondict&name=tc_data_viz_meetup_commenters&query=' + encodeURI(query) + '&callback=?';
   var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC', '#33CCFF', '#003DF5', '#002EB8', '#FF3366', '#33FFCC', '#B88A00', '#F5B800', '#FF6633', '#33FF66', '#66FF33', '#CCFF33', '#FFCC33'];
   var colorsUsed = [];
+  var conf = {
+    dataMultiplier: 4,
+    matchLimit: 8,
+    waitUpper: 350,
+    waitLower: 250,
+    fadeTime: 180,
+  };
   
   
   
@@ -20,7 +27,7 @@
   // Model for entry
   var Entry = Backbone.Model.extend({
     initialize: function() {
-      this.set('color', this.pickColorOrder());
+      this.set('color', this.pickColorRandom());
     },
     
     pickColorRandom: function() {
@@ -74,7 +81,7 @@
       data.cid = this.model.cid;
       $cell = $(_.template(this.templates.entry, data)).hide();
       this.$el.html($cell);
-      $cell.fadeIn(100, 'swing');
+      $cell.fadeIn(conf.fadeTime, 'swing');
       return this;
     }
   });
@@ -109,12 +116,26 @@
       var thisView = this;
       
       $.getJSON(dataURL, function(data) {
+        thisView.original = data;
         thisView.collection = new Entries(data);
+        
         thisView.$el.html('');
+        
+        thisView.multiplyData();
         thisView.setGrid();
         thisView.makeGrid();
         thisView.fillGrid();
       });
+    },
+    
+    multiplyData: function() {
+      var thisView = this;
+      
+      for (var i = 0; i < conf.dataMultiplier; i++) {
+        this.collection.each(function(m, i) {
+          thisView.collection.push(m.toJSON());
+        });
+      };
     },
     
     makeGrid: function() {
@@ -136,7 +157,7 @@
       this.collection.each(function(m, i) {
         var $cell = thisView.$el.find('div[data-cid=' + m.cid + ']');
         var found = 0;
-        var limitFound = randomInt(4, 10);
+        var limitFound = randomInt(1, conf.matchLimit);
         $cell.attr('data-found-limit', limitFound);
         
         var intervalID = w.setInterval(function() {
@@ -146,14 +167,14 @@
             el: $cell
           }).render();
           
-          if (guess.cid === m.cid) {
+          if (guess.get('member') === m.get('member')) {
             found += 1;
             $cell.attr('data-found', found);
             if (found == limitFound) {
               w.clearTimeout(intervalID);
             }
           }
-        }, randomInt(300, 400));
+        }, randomInt(conf.waitLower, conf.waitUpper));
       });
     }
   });

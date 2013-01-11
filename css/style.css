@@ -1,14 +1,28 @@
 /**
  * Main CSS for Random Picker Thingy.
  */
+body, html {
+  background-color: #171717;
+}
+
+.thing-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2%;
+}
+ 
 #random-picker-container-thingy {
   width: 100%;
   height: 100%;
-  position: absolute;
 }
 
 .cell {
   float: left;
+  border: 4px solid #171717;
+  box-sizing: border-box;
 }
 
 .entry {
