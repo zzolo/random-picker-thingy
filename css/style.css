@@ -9,4 +9,8 @@
 
 .choice-square {
   float: left;
+  border-wdith: 3px;
+  -moz-box-sizing: border-box; 
+  -webkit-box-sizing: border-box; 
+  box-sizing: border-box;
 }

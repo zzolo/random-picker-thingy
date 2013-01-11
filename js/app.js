@@ -11,20 +11,34 @@
     var w = $container.width();
     var h = $container.height();
     var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC', '#33CCFF', '#003DF5', '#002EB8', '#FF3366', '#33FFCC', '#B88A00', '#F5B800', '#FF6633', '#33FF66', '#66FF33', '#CCFF33', '#FFCC33'];
-    var colorIndex = 0;
+    var colorsUsed = [];
     
-    // Function to get random integer
+    // Functions to get random things
     var randomInt = function(min, max) {
       return Math.floor((Math.random() * ((max + 1) - min)) + min);
+    };
+    var randomArrayValue = function(arr) {
+      return arr[randomInt(0, arr.length - 1)];
     };
     
     // Function to get color
     var getColor = function() {
-      colorIndex += 1;
-      if (colorIndex > colors.length) {
-        colorIndex = 0;
+      var notUsed = false;
+      var color;
+      
+      if (colorsUsed.length === colors.length) {
+        colorsUsed = [];
       }
-      return colors[colorIndex];
+      
+      while (!notUsed) {
+        color = randomArrayValue(colors);
+        if (colorsUsed.indexOf(color) === -1) {
+          notUsed = true;
+        }
+      }
+      
+      colorsUsed.push(color);
+      return color;
     };
     
     // Mark as loading
@@ -38,8 +52,9 @@
       
       $container.html('');
       data = _.map(data, function(d, i) {
-        d.width = w / columns;
-        d.height = h / rows;
+        // Use percentage for width and height.
+        d.width = 100 / columns;
+        d.height = 100 / rows;
         d.color = getColor();
         
         $container.prepend(_.template(templateSquare, d));
