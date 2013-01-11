@@ -7,10 +7,12 @@
   position: absolute;
 }
 
-.choice-square {
+.cell {
   float: left;
-  border-wdith: 3px;
-  -moz-box-sizing: border-box; 
-  -webkit-box-sizing: border-box; 
-  box-sizing: border-box;
+}
+
+.entry {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
 }
