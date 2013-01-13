@@ -9,14 +9,15 @@
   var colors = ['#3366FF', '#33CCFF', '#003DF5', '#668CFF', '#66D9FF', '#295EFF', '#6188FF', '#00ACE6'];
   var colorsUsed = [];
   var conf = {
-    dataMultiplier: 1,
+    dataMultiplier: 2,
     matchLimitLower: 1,
-    matchLimitUpper: 1,
+    matchLimitUpper: 2,
     waitUpper: 300,
     waitLower: 250,
     fadeTime: 180,
     finishBackgroundTileTime: 1000,
-    finishTileTime: 100
+    finishTileTime: 100,
+    goBackgroundTime: 500
   };
   var exceptions = ['Alan Palazzolo', 'bryan kennedy'];
   
@@ -104,6 +105,7 @@
       this.templates = this.templates || {};
       this.templates.loading = $('#template-loading').html();
       this.templates.cell = $('#template-cell').html();
+      this.templates.checkData = $('#template-check-data').html();
       
       this.startLoading();
       this.getData();
@@ -131,11 +133,32 @@
         thisView.collection = new Entries(data);
         
         thisView.$el.html('');
+        thisView.checkData();
+      });
+    },
+    
+    checkData: function() {
+      var thisView = this;
+      var go, $go;
+      
+      this.$el.html(_.template(this.templates.checkData, { c: this.collection.toJSON() }));
+      $go = this.$el.find('.go-go-go');
+      
+      go = w.setInterval(function() {
+        $go.animate({
+          backgroundColor: thisView.collection.at(randomInt(0, thisView.collection.length - 1)).get('color')
+        }, (conf.goBackgroundTime - (conf.goBackgroundTime * .1)));
+      }, conf.goBackgroundTime);
+      
+      $go.click(function(e) {
+        e.preventDefault();
+        clearTimeout(go);
         
+        thisView.$el.html('');
         thisView.multiplyData();
         thisView.setGrid();
         thisView.makeGrid();
-        thisView.fillGrid();
+        thisView.fillGrid();  
       });
     },
     
@@ -239,7 +262,13 @@
           'font-size': $container.height() / 3
         }).html(winner.get('member'));
         
-      }, conf.finishTileTime * counter);
+        w.setInterval(function() {
+          $container.animate({
+            backgroundColor: thisView.collection.at(randomInt(0, thisView.collection.length - 1)).get('color')
+          }, (conf.goBackgroundTime - (conf.goBackgroundTime * .1)));
+        }, conf.goBackgroundTime);
+        
+      }, conf.finishTileTime * (counter + 1));
     }
   });
 
