@@ -4,17 +4,21 @@
 (function($, w, undefined) {
   var query = "SELECT DISTINCT member FROM `swdata`";
   var dataURL = 'https://api.scraperwiki.com/api/1.0/datastore/sqlite?format=jsondict&name=tc_data_viz_meetup_commenters&query=' + encodeURI(query) + '&callback=?';
-  var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC', '#33CCFF', '#003DF5', '#002EB8', '#FF3366', '#33FFCC', '#B88A00', '#F5B800', '#FF6633', '#33FF66', '#66FF33', '#CCFF33', '#FFCC33'];
+  //var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC', '#33CCFF', '#003DF5', '#002EB8', '#FF3366', '#33FFCC', '#B88A00', '#F5B800', '#FF6633', '#33FF66', '#66FF33', '#CCFF33', '#FFCC33'];
+  //var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC'];
+  var colors = ['#3366FF', '#33CCFF', '#003DF5', '#668CFF', '#66D9FF', '#295EFF', '#6188FF', '#00ACE6'];
   var colorsUsed = [];
   var conf = {
-    dataMultiplier: 4,
-    matchLimit: 8,
-    waitUpper: 350,
+    dataMultiplier: 1,
+    matchLimitLower: 1,
+    matchLimitUpper: 1,
+    waitUpper: 300,
     waitLower: 250,
     fadeTime: 180,
+    finishBackgroundTileTime: 1000,
+    finishTileTime: 100
   };
-  
-  
+  var exceptions = ['Alan Palazzolo', 'bryan kennedy'];
   
   // Functions to get random things
   var randomInt = function(min, max) {
@@ -27,7 +31,7 @@
   // Model for entry
   var Entry = Backbone.Model.extend({
     initialize: function() {
-      this.set('color', this.pickColorRandom());
+      this.set('color', this.pickColorOrder());
     },
     
     pickColorRandom: function() {
@@ -51,20 +55,26 @@
     
     pickColorOrder: function() {
       var index;
+      var color;
       
       if (colorsUsed.length === colors.length) {
         colorsUsed = [];
       }
       
       index = colorsUsed.length;
-      colorsUsed.push(colors[index]);
-      return colors[index];
+      color = colors[index];
+      colorsUsed.push(color);
+      return color;
     }
   });
   
   // Entry collection
   var Entries = Backbone.Collection.extend({
-    model: Entry
+    model: Entry,
+    
+    comparator: function(m) {
+      return m.cid;
+    }
   });
   
   // Entry view
@@ -116,6 +126,7 @@
       var thisView = this;
       
       $.getJSON(dataURL, function(data) {
+        data = thisView.removeExceptions(data);
         thisView.original = data;
         thisView.collection = new Entries(data);
         
@@ -128,10 +139,21 @@
       });
     },
     
+    removeExceptions: function(data) {
+      var parsed = [];
+      _.each(data, function(d, i) {
+        if (exceptions.indexOf(d.member) === -1) {
+          parsed.push(d);
+        }
+      });
+      
+      return parsed;
+    },
+    
     multiplyData: function() {
       var thisView = this;
       
-      for (var i = 0; i < conf.dataMultiplier; i++) {
+      for (var i = 1; i < conf.dataMultiplier; i++) {
         this.collection.each(function(m, i) {
           thisView.collection.push(m.toJSON());
         });
@@ -157,7 +179,7 @@
       this.collection.each(function(m, i) {
         var $cell = thisView.$el.find('div[data-cid=' + m.cid + ']');
         var found = 0;
-        var limitFound = randomInt(1, conf.matchLimit);
+        var limitFound = randomInt(conf.matchLimitLower, conf.matchLimitUpper);
         $cell.attr('data-found-limit', limitFound);
         
         var intervalID = w.setInterval(function() {
@@ -167,15 +189,57 @@
             el: $cell
           }).render();
           
-          if (guess.get('member') === m.get('member')) {
+          if (guess.cid === m.cid) {
             found += 1;
             $cell.attr('data-found', found);
             if (found == limitFound) {
+              thisView.collection.get(m.cid).set('matched', true);
               w.clearTimeout(intervalID);
+              thisView.testFinish();
             }
           }
         }, randomInt(conf.waitLower, conf.waitUpper));
       });
+    },
+    
+    testFinish: function() {
+      var allMatched = true;
+      this.collection.each(function(m, i) {
+        if (m.get('matched') !== true) {
+          allMatched = false;
+        }
+      });
+      
+      if (allMatched) {
+        this.finish();
+      }
+    },
+    
+    finish: function() {
+      // This is actually picking the winner.
+      var winner = this.collection.at(randomInt(0, this.collection.length - 1));
+      var counter = 0;
+      var thisView = this;
+
+      this.$el.find('div').each(function() {
+        var $this = $(this);
+        counter += 1;
+        
+        w.setTimeout(function() {
+          $this.animate({
+            backgroundColor: winner.get('color')
+          }, conf.finishBackgroundTileTime);
+        }, conf.finishTileTime * counter);
+      });
+      
+      w.setTimeout(function() {
+        var $container = thisView.$el.find('div.entry[data-cid=' + winner.cid + ']');
+        
+        $container.css({
+          'font-size': $container.height() / 3
+        }).html(winner.get('member'));
+        
+      }, conf.finishTileTime * counter);
     }
   });
 
