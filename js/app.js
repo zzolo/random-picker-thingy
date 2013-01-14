@@ -9,17 +9,18 @@
   var colors = ['#3366FF', '#33CCFF', '#003DF5', '#668CFF', '#66D9FF', '#295EFF', '#6188FF', '#00ACE6'];
   var colorsUsed = [];
   var conf = {
-    dataMultiplier: 2,
+    dataMultiplier: 3,
     matchLimitLower: 1,
-    matchLimitUpper: 2,
-    waitUpper: 300,
+    matchLimitUpper: 1,
+    waitUpper: 350,
     waitLower: 250,
     fadeTime: 180,
     finishBackgroundTileTime: 1000,
     finishTileTime: 100,
     goBackgroundTime: 500
   };
-  var exceptions = ['Alan Palazzolo', 'bryan kennedy'];
+  var exceptions = ['Alan Palazzolo', 'bryan kennedy', 'Kristina Durivage'];
+  var randomURL = 'http://random-proxy.herokuapp.com/integers/?num=1&min=0&max=[[[MAX]]]&col=1&base=10&format=plain&rnd=new&callback=?';
   
   // Functions to get random things
   var randomInt = function(min, max) {
@@ -111,15 +112,6 @@
       this.getData();
     },
     
-    setGrid: function() {
-      this.width = $(this.el).width();
-      this.height = $(this.el).height();
-      this.columns = Math.ceil(Math.sqrt(this.collection.length));
-      this.rows = Math.ceil(this.collection.length / this.columns);
-      this.cellWidth = 100 / this.rows;
-      this.cellHeight = 100 / this.columns;
-    },
-    
     startLoading: function() {
       this.$el.html(_.template(this.templates.loading, {}));
     },
@@ -157,8 +149,9 @@
         thisView.$el.html('');
         thisView.multiplyData();
         thisView.setGrid();
+        thisView.getRandom();
         thisView.makeGrid();
-        thisView.fillGrid();  
+        thisView.fillGrid();
       });
     },
     
@@ -181,6 +174,27 @@
           thisView.collection.push(m.toJSON());
         });
       };
+    },
+    
+    setGrid: function() {
+      this.width = $(this.el).width();
+      this.height = $(this.el).height();
+      this.columns = Math.ceil(Math.sqrt(this.collection.length));
+      this.rows = Math.ceil(this.collection.length / this.columns);
+      this.cellWidth = 100 / this.rows;
+      this.cellHeight = 100 / this.columns;
+    },
+    
+    getRandom: function() {
+      var thisView = this;
+      
+      this.randomWinner = null;
+      randomURL = randomURL.replace('[[[MAX]]]', this.collection.length - 1);
+      $.getJSON(randomURL, function(data) {
+        if (data.error !== true) {
+          thisView.randomWinner = parseInt(data.response);
+        }
+      });
     },
     
     makeGrid: function() {
@@ -240,9 +254,16 @@
     
     finish: function() {
       // This is actually picking the winner.
-      var winner = this.collection.at(randomInt(0, this.collection.length - 1));
+      var winner = this.randomWinner;
       var counter = 0;
       var thisView = this;
+
+      // See if we got a number from random.org
+      if (winner === null) {
+        console.log('randommmming');
+        winner = this.collection.at(randomInt(0, this.collection.length - 1));
+      }
+      winner = this.collection.at(winner);
 
       this.$el.find('div').each(function() {
         var $this = $(this);
