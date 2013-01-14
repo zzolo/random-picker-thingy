@@ -89,11 +89,25 @@
     },
     
     render: function() {
-      var data = this.model.toJSON();
-      data.cid = this.model.cid;
-      $cell = $(_.template(this.templates.entry, data)).hide();
-      this.$el.html($cell);
-      $cell.fadeIn(conf.fadeTime, 'swing');
+      var data;
+      var $entry = this.$el.find('.entry');
+      
+      if ($entry.size() > 0) {
+        $entry.attr({
+          'data-cid': this.model.cid,
+          'data-member': this.model.get('member')
+        })
+        .animate({
+          backgroundColor: this.model.get('color')
+        }, conf.fadeTime);
+      }
+      else {
+        data = this.model.toJSON();
+        data.cid = this.model.cid;
+        $cell = $(_.template(this.templates.entry, data)).hide();
+        this.$el.html($cell);
+        $cell.fadeIn(conf.fadeTime, 'swing');
+      }
       return this;
     }
   });
