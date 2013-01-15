@@ -4,9 +4,14 @@
 (function($, w, undefined) {
   var query = "SELECT DISTINCT member FROM `swdata`";
   var dataURL = 'https://api.scraperwiki.com/api/1.0/datastore/sqlite?format=jsondict&name=tc_data_viz_meetup_commenters&query=' + encodeURI(query) + '&callback=?';
+  
   //var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC', '#33CCFF', '#003DF5', '#002EB8', '#FF3366', '#33FFCC', '#B88A00', '#F5B800', '#FF6633', '#33FF66', '#66FF33', '#CCFF33', '#FFCC33'];
   //var colors = ['#3366FF', '#6633FF', '#CC33FF', '#FF33CC'];
-  var colors = ['#3366FF', '#33CCFF', '#003DF5', '#668CFF', '#66D9FF', '#295EFF', '#6188FF', '#00ACE6'];
+  //var colors = ['#3366FF', '#33CCFF', '#003DF5', '#668CFF', '#66D9FF', '#295EFF', '#6188FF', '#00ACE6'];
+  var colors = ['#90CA77', '#81C6DD', '#E9B64D', '#E48743', '#9E3B33'];
+  //var colors = ['#4D8963', '#69A583', '#E1B378', '#E0CC97', '#EC799A', '#9F0251'];
+  //var colors = ['#AD0066', '#D13D94', '#F5851F', '#CADA2A', '#81A4B9', '#CFE8F6'];
+  
   var colorsUsed = [];
   var conf = {
     dataMultiplier: 3,
