@@ -14,11 +14,11 @@
   
   var colorsUsed = [];
   var conf = {
-    dataMultiplier: 3,
+    dataMultiplier: 4,
     matchLimitLower: 1,
     matchLimitUpper: 1,
-    waitUpper: 350,
-    waitLower: 250,
+    waitUpper: 300,
+    waitLower: 210,
     fadeTime: 180,
     finishBackgroundTileTime: 1000,
     finishTileTime: 100,
