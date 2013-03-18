@@ -5,6 +5,27 @@ body, html {
   background-color: #171717;
 }
 
+.clearfix:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+ 
+.clearfix {
+  display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+  display: block;
+}
+ 
+* html .clearfix {
+  height: 1%;
+}
+
 .thing-container {
   position: absolute;
   top: 0;
@@ -44,6 +65,11 @@ body, html {
 .check-data-container ul {
   list-style: none;
   margin-botton: 2.5em;
+}
+
+.check-data-container ul li {
+  width: 50%;
+  float: left;
 }
 
 .check-data-container .go-go-go {

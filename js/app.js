@@ -14,7 +14,7 @@
   
   var colorsUsed = [];
   var conf = {
-    dataMultiplier: 4,
+    dataMultiplier: 3,
     matchLimitLower: 1,
     matchLimitUpper: 1,
     waitUpper: 300,
@@ -24,7 +24,7 @@
     finishTileTime: 100,
     goBackgroundTime: 500
   };
-  var exceptions = ['Alan Palazzolo', 'bryan kennedy', 'Kristina Durivage'];
+  var exceptions = ['Alan Palazzolo', 'bryan kennedy', 'Kristina Durivage', 'Ian Adams'];
   var randomURL = 'http://random-proxy.herokuapp.com/integers/?num=1&min=0&max=[[[MAX]]]&col=1&base=10&format=plain&rnd=new&callback=?';
   
   // Functions to get random things
@@ -142,6 +142,7 @@
         data = thisView.removeExceptions(data);
         thisView.original = data;
         thisView.collection = new Entries(data);
+        thisView.collection.sort();
         
         thisView.$el.html('');
         thisView.checkData();
@@ -190,7 +191,8 @@
       
       for (var i = 1; i < conf.dataMultiplier; i++) {
         this.collection.each(function(m, i) {
-          thisView.collection.push(m.toJSON());
+          var entry = new Entry(m.toJSON());
+          thisView.collection.add(entry);
         });
       };
     },
