@@ -14,7 +14,7 @@
   
   var colorsUsed = [];
   var conf = {
-    dataMultiplier: 3,
+    dataMultiplier: 2,
     matchLimitLower: 1,
     matchLimitUpper: 1,
     waitUpper: 300,
@@ -214,6 +214,7 @@
       $.getJSON(randomURL, function(data) {
         if (data.error !== true) {
           thisView.randomWinner = parseInt(data.response);
+          //alert(thisView.randomWinner);
         }
       });
     },
@@ -282,7 +283,7 @@
       // See if we got a number from random.org
       if (winner === null) {
         console.log('randommmming');
-        winner = this.collection.at(randomInt(0, this.collection.length - 1));
+        winner = randomInt(0, this.collection.length - 1);
       }
       winner = this.collection.at(winner);
 
